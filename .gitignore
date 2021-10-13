@@ -1,0 +1,6 @@
+# build artifacts
+/out
+
+
+# VS config files
+/.vs
