@@ -3,6 +3,7 @@
 #include "Utils/ComClass.h"
 #include <ShObjIdl_core.h>
 #include <forward_list>
+#include <rapidjson/rapidjson.h>
 #include <string>
 
 namespace vkloud::shellext
@@ -22,12 +23,16 @@ public:
 
     static HRESULT Register(PCWSTR moduleName);
     static HRESULT Unregister();
+    static const CLSID& ClassId();
 
 private:
     static std::forward_list<std::wstring> GetSelectedFiles(LPDATAOBJECT dataObject);
+    static std::wstring GetVkloudRootDirectory();
 
 private:
     static constinit CLSID classId;
+
+    std::forward_list<std::wstring> files;
 };
 
 } // namespace vkloud::shellext

@@ -1,6 +1,8 @@
 # build artifacts
 /out
 
+# Python virtual environment
+/.venv
 
 # VS config files
 /.vs

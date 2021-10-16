@@ -1,5 +1,6 @@
-#include <Windows.h>
 #include "ContextMenuExtension.h"
+#include "ExtensionFactory.h"
+#include <Windows.h>
 
 HMODULE thisModule = nullptr;
 
@@ -22,7 +23,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
 STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppv)
 {
-    return CLASS_E_CLASSNOTAVAILABLE;
+    HRESULT result = CLASS_E_CLASSNOTAVAILABLE;
+
+    try
+    {
+        auto factory = new vkloud::shellext::ExtensionFactory(rclsid);
+        result = factory->QueryInterface(riid, ppv);
+        factory->Release();
+    }
+    catch (...)
+    {
+    }
+
+    return result;
 }
 
 STDAPI DllCanUnloadNow()

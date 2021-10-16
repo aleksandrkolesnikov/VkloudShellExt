@@ -1,10 +1,17 @@
 #include "ExtensionFactory.h"
+#include "ContextMenuExtension.h"
 
 namespace vkloud::shellext
 {
 
-ExtensionFactory::ExtensionFactory()
+ExtensionFactory::ExtensionFactory(const CLSID& id)
 {
+    if (!IsExtensionSupported(id))
+    {
+        throw "TODO: Create suitable exception";
+    }
+
+    classId = id;
 }
 
 ExtensionFactory::~ExtensionFactory()
@@ -38,7 +45,9 @@ HRESULT ExtensionFactory::CreateInstance(IUnknown* outer, REFIID riid, void** pp
 
     if (!outer)
     {
-        *ppv = nullptr;
+        IUnknown* extension = CreateExtension();
+        result = extension->QueryInterface(riid, ppv);
+        extension->Release();
     }
 
     return result;
@@ -47,6 +56,22 @@ HRESULT ExtensionFactory::CreateInstance(IUnknown* outer, REFIID riid, void** pp
 HRESULT ExtensionFactory::LockServer(BOOL lock)
 {
     return S_OK;
+}
+
+IUnknown* ExtensionFactory::CreateExtension()
+{
+    if (classId == ContextMenuExtension::ClassId())
+    {
+        return reinterpret_cast<IUnknown*>(new ContextMenuExtension());
+    }
+
+    // TODO: Unreachable code
+    return nullptr;
+}
+
+bool ExtensionFactory::IsExtensionSupported(const CLSID& id)
+{
+    return id == ContextMenuExtension::ClassId();
 }
 
 } // namespace vkloud::shellext

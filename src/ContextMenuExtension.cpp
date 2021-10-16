@@ -1,6 +1,11 @@
 #include "ContextMenuExtension.h"
 #include "Utils/RegisterHelper.h"
+#include <UserEnv.h>
+#include <filesystem>
+#include <fstream>
 #include <memory>
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
 
 constexpr auto IDM_DISPLAY = 0;
 
@@ -38,8 +43,22 @@ HRESULT ContextMenuExtension::QueryInterface(REFIID riid, void** ppv)
 
 HRESULT ContextMenuExtension::Initialize(LPCITEMIDLIST idlFolder, LPDATAOBJECT dataObject, HKEY key)
 {
-    if (!dataObject)
+    if (dataObject)
     {
+        try
+        {
+            const auto vkRoot = GetVkloudRootDirectory();
+            files = GetSelectedFiles(dataObject);
+            if (!files.empty() && files.front().starts_with(vkRoot))
+            {
+                return S_OK;
+            }
+        }
+        catch (...)
+        {
+            return E_FAIL;
+        }
+
         return E_INVALIDARG;
     }
 
@@ -127,6 +146,11 @@ HRESULT ContextMenuExtension::Unregister()
     return result;
 }
 
+const CLSID& ContextMenuExtension::ClassId()
+{
+    return classId;
+}
+
 std::forward_list<std::wstring> ContextMenuExtension::GetSelectedFiles(LPDATAOBJECT dataObject)
 {
     std::forward_list<std::wstring> files;
@@ -157,6 +181,30 @@ std::forward_list<std::wstring> ContextMenuExtension::GetSelectedFiles(LPDATAOBJ
     }
 
     return files;
+}
+
+std::wstring ContextMenuExtension::GetVkloudRootDirectory()
+{
+    TCHAR profileDirPath[MAX_PATH] = {0};
+    DWORD size = MAX_PATH;
+    if (!::GetUserProfileDirectory(::GetCurrentProcessToken(), profileDirPath, &size))
+    {
+        throw "TODO: Create suitable exception";
+    }
+
+    std::filesystem::path configPath{profileDirPath};
+    configPath = configPath / ".vkloud" / "config";
+    if (!std::filesystem::exists(configPath))
+    {
+        throw "TODO: Create suitable exception";
+    }
+
+    std::wifstream input{configPath};
+    rapidjson::WIStreamWrapper stream{input};
+    rapidjson::GenericDocument<rapidjson::UTF16<>> document;
+    document.ParseStream(stream);
+
+    return document[L"vkroot"].GetString();
 }
 
 } // namespace vkloud::shellext
