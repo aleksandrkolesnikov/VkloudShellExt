@@ -7,12 +7,15 @@ add_library(${TARGET_VKLOUDSHELLEXT_NAME}
         DllMain.cpp
         ExportFunctions.def
         ExtensionFactory.h
-        Utils/ComClass.h
         ExtensionFactory.cpp
         ContextMenuExtension.h
         ContextMenuExtension.cpp
         Utils/RegisterHelper.h
-        Utils/RegisterHelper.cpp)
+        Utils/RegisterHelper.cpp
+        Utils/Handle.h
+        Utils/ComClass.h
+        Control/NamedPipeClient.h
+        Control/NamedPipeClient.cpp)
 
 target_link_libraries(${TARGET_VKLOUDSHELLEXT_NAME}
     RapidJSON::RapidJSON
