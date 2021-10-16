@@ -14,7 +14,7 @@ class ComClass : public T...
 {
 public:
     ComClass() noexcept
-        : counter_{1}
+        : counter{1}
     {
     }
 
@@ -22,13 +22,13 @@ public:
 
     virtual ULONG AddRef() override
     {
-        return ::InterlockedIncrement(&counter_);
+        return ::InterlockedIncrement(&counter);
     }
 
     virtual ULONG Release() override
     {
-        const auto current = ::InterlockedDecrement(&counter_);
-        if (counter_ == 0)
+        const auto current = ::InterlockedDecrement(&counter);
+        if (counter == 0)
         {
             delete this;
         }
@@ -44,7 +44,7 @@ public:
     }
 
 private:
-    ULONG counter_;
+    ULONG counter;
 };
 
 } // namespace vkloud::shellext::utils
