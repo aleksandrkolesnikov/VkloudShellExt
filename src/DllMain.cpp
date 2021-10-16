@@ -3,6 +3,7 @@
 #include <Windows.h>
 
 HMODULE thisModule = nullptr;
+long globalDllRefCounter = 0;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -40,7 +41,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppv)
 
 STDAPI DllCanUnloadNow()
 {
-    return S_OK;
+    return globalDllRefCounter > 0 ? S_FALSE : S_OK;
 }
 
 STDAPI DllRegisterServer()

@@ -1,6 +1,8 @@
 #include "ExtensionFactory.h"
 #include "ContextMenuExtension.h"
 
+extern long globalDllRefCounter;
+
 namespace vkloud::shellext
 {
 
@@ -12,10 +14,12 @@ ExtensionFactory::ExtensionFactory(const CLSID& id)
     }
 
     classId = id;
+    ::InterlockedIncrement(&globalDllRefCounter);
 }
 
 ExtensionFactory::~ExtensionFactory()
 {
+    ::InterlockedDecrement(&globalDllRefCounter);
 }
 
 HRESULT ExtensionFactory::QueryInterface(REFIID riid, void** ppv)
@@ -55,7 +59,14 @@ HRESULT ExtensionFactory::CreateInstance(IUnknown* outer, REFIID riid, void** pp
 
 HRESULT ExtensionFactory::LockServer(BOOL lock)
 {
-    return S_OK;
+    if (lock)
+    {
+        ::InterlockedIncrement(&globalDllRefCounter);
+    }
+    else
+    {
+        ::InterlockedDecrement(&globalDllRefCounter);
+    }
 }
 
 IUnknown* ExtensionFactory::CreateExtension()
