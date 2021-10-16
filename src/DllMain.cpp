@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include "ContextMenuExtension.h"
 
 HMODULE thisModule = nullptr;
 
@@ -31,10 +32,20 @@ STDAPI DllCanUnloadNow()
 
 STDAPI DllRegisterServer()
 {
-    return S_OK;
+    using namespace vkloud::shellext;
+
+    wchar_t moduleName[MAX_PATH];
+    if (!::GetModuleFileName(thisModule, moduleName, ARRAYSIZE(moduleName)))
+    {
+        return HRESULT_FROM_WIN32(GetLastError());
+    }
+
+    return ContextMenuExtension::Register(moduleName);
 }
 
 STDAPI DllUnregisterServer()
 {
-    return S_OK;
+    using namespace vkloud::shellext;
+
+    return ContextMenuExtension::Unregister();
 }

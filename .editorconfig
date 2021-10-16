@@ -4,6 +4,6 @@ root = true
 insert_final_newline = true
 end_of_line = lf
 
-[*.{cs, h}]
+[*.{cpp, h, txt}]
 indent_size = 4
 indent_style = space
