@@ -67,6 +67,8 @@ HRESULT ExtensionFactory::LockServer(BOOL lock)
     {
         ::InterlockedDecrement(&globalDllRefCounter);
     }
+
+    return S_OK;
 }
 
 IUnknown* ExtensionFactory::CreateExtension()
