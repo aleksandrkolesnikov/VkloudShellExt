@@ -59,7 +59,7 @@ HRESULT ContextMenuExtension::Initialize(LPCITEMIDLIST idlFolder, LPDATAOBJECT d
             return E_FAIL;
         }
 
-        return E_INVALIDARG;
+        //return E_INVALIDARG;
     }
 
     return E_FAIL;
@@ -203,8 +203,9 @@ std::wstring ContextMenuExtension::GetVkloudRootDirectory()
     rapidjson::WIStreamWrapper stream{input};
     rapidjson::GenericDocument<rapidjson::UTF16<>> document;
     document.ParseStream(stream);
+    std::filesystem::path result{document[L"vkroot"].GetString()};
 
-    return document[L"vkroot"].GetString();
+    return result.make_preferred().c_str();
 }
 
 } // namespace vkloud::shellext
